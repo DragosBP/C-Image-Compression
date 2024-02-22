@@ -1,0 +1,48 @@
+double media(Tree root) {
+    return ((float)(root->elem.RGB.red) + (float)(root->elem.RGB.green) + (float)(root->elem.RGB.blue))/3;
+}
+
+void avl_print_dot_aux(Tree node, FILE* stream) {
+    static int nullcount = 0;
+
+    if (node->top_left) {
+        fprintf(stream, "    %f -> %f;\n", media(node), media(node->top_left));
+        avl_print_dot_aux(node->top_left, stream);
+    }
+    if (node->top_right) {
+        fprintf(stream, "    %f -> %f;\n", media(node), media(node->top_right));
+        avl_print_dot_aux(node->top_right, stream);
+    }
+    if (node->bottom_left) {
+        fprintf(stream, "    %f -> %f;\n", media(node), media(node->bottom_left));
+        avl_print_dot_aux(node->bottom_left, stream);
+    }
+    if (node->bottom_right) {
+        fprintf(stream, "    %f -> %f;\n", media(node), media(node->bottom_right));
+        avl_print_dot_aux(node->bottom_right, stream);
+    }
+}
+
+void avl_print_dot(Tree tree, FILE* stream, int type) {
+    fprintf(stream, "digraph BST {\n");
+    if (type == 1)
+    	fprintf(stream, "    node [fontname=\"Arial\", shape=circle, style=filled, fillcolor=green];\n");
+    else
+    	fprintf(stream, "    node [fontname=\"Arial\", shape=circle, style=filled, fillcolor=blue];\n");
+    if (!tree)
+        fprintf(stream, "\n");
+    else if (!tree->bottom_left && !tree->top_left && !tree->bottom_right && !tree->top_right)
+        fprintf(stream, "    %f;\n", media(tree));
+    else
+        avl_print_dot_aux(tree, stream);
+    fprintf(stream, "}\n");
+}
+
+void avl_draw(Tree tree, char *filename) {
+	FILE *f = fopen("test.dot", "w");
+	char buffer[SIZE];
+	avl_print_dot(tree, f, 1);
+	fclose(f);
+	sprintf(buffer, "dot test.dot | neato -n -Tpng -o %s", filename);
+	system(buffer);
+}
